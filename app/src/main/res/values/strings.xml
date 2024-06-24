@@ -1,0 +1,19 @@
+<resources>
+
+    <!--    Untranslatable-->
+    <string name="app_name" translatable="false">Herb</string>
+    <string name="title_activity_home" translatable="false">HomeActivity</string>
+    <string name="title_activity_herb_detail" translatable="false">HerbDetailActivity</string>
+    <string name="dummy_text" translatable="false">DummyText</string>
+    <!--    -->
+
+    <string name="title_patient">Patient</string>
+    <string name="title_herb">Herb</string>
+    <string name="title_setting">Settings</string>
+    <string name="avg_price">AvgPrice</string>
+    <string name="weight_remain">Remain</string>
+    <string name="total_money">Total Money</string>
+    <string name="add_herb_title">Add Herb</string>
+    <string name="add_dialg_herb_name">Herb Name</string>
+    <string name="save">Save</string>
+</resources>

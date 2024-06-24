@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_patient">Bệnh nhân</string>
+    <string name="title_herb">Thảo dược</string>
+    <string name="title_setting">Cài đặt</string>
+    <string name="avg_price">Giá TB</string>
+    <string name="weight_remain">Tồn kho</string>
+    <string name="total_money">Tổng tiền</string>
+    <string name="add_herb_title">Thêm loại thuốc</string>
+    <string name="add_dialg_herb_name">Tên thuốc</string>
+    <string name="save">Lưu</string>
+
+</resources>
