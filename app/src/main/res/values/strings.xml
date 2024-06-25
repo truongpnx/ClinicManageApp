@@ -14,6 +14,11 @@
     <string name="weight_remain">Remain</string>
     <string name="total_money">Total Money</string>
     <string name="add_herb_title">Add Herb</string>
-    <string name="add_dialg_herb_name">Herb Name</string>
+    <string name="herb_name">Herb name</string>
     <string name="save">Save</string>
+    <string name="detail">Detail</string>
+    <string name="none_type">None</string>
+    <string name="sort_by">Sort by</string>
+    <string name="total_money_of">Total money of</string>
+
 </resources>

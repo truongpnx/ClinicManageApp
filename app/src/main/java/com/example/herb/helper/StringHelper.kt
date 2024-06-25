@@ -15,7 +15,14 @@ interface StringHelper {
 
     companion object: StringHelper {
         override fun numberToVND(number: Number): String {
-            return ceil(number.toFloat()).toInt().toString() + ".00 VND"
+            var normNum = ceil(number.toFloat()).toInt()
+            var res = ""
+            while (normNum > 1000) {
+                res += ".000"
+                normNum /= 1000
+            }
+            res = normNum.toString() + res
+            return "$res,00 VND"
         }
 
         override fun numberToFloorWeight(number: Number, weightUnit: String): String {

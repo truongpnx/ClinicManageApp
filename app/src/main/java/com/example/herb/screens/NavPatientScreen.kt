@@ -17,11 +17,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.herb.R
 
 @Composable
-fun PatientScreen(paddingValues: PaddingValues = PaddingValues()) {
+fun PatientScreen(modifier: Modifier) {
 
     Box(
-        modifier = Modifier
-            .padding(paddingValues)
+        modifier = modifier
             .fillMaxSize()
             .background(Color.Red),
         contentAlignment = Alignment.Center,
@@ -38,5 +37,5 @@ fun PatientScreen(paddingValues: PaddingValues = PaddingValues()) {
 @Composable
 @Preview
 fun PreviewPatientScreen() {
-    PatientScreen()
+//    PatientScreen()
 }

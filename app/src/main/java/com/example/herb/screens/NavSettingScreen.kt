@@ -17,11 +17,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.herb.R
 
 @Composable
-fun SettingScreen(paddingValues: PaddingValues = PaddingValues()) {
+fun SettingScreen(modifier: Modifier) {
 
     Box(
-        modifier = Modifier
-            .padding(paddingValues)
+        modifier = modifier
             .fillMaxSize()
             .background(Color.Black),
         contentAlignment = Alignment.Center,
@@ -38,5 +37,5 @@ fun SettingScreen(paddingValues: PaddingValues = PaddingValues()) {
 @Composable
 @Preview
 fun PreviewSettingScreen() {
-    SettingScreen()
+//    SettingScreen()
 }

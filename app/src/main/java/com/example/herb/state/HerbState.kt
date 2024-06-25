@@ -1,7 +1,7 @@
 package com.example.herb.state
 
 import com.example.herb.database.entity.Herb
-import com.example.herb.util.SortType
+import com.example.herb.util.HerbSortType
 
 data class HerbState (
     val herbs: List<Herb> = emptyList(),
@@ -14,5 +14,5 @@ data class HerbState (
 
 data class HerbQuerySort (
     val stringQuery: String = "",
-    val sortType: SortType = SortType.ID,
+    val herbSortType: HerbSortType = HerbSortType.ID,
 )

@@ -10,6 +10,8 @@
     <color name="theme">#2DA2FF</color>
     <color name="theme_20">#332DA2FF</color>
     <color name="theme_50">#802DA2FF</color>
+    <color name="theme_10">#1A2DA2FF</color>
+    <color name="herb_color">#14FF85</color>
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
     <color name="light_blue_A200">#FF40C4FF</color>

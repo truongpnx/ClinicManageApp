@@ -1,6 +1,6 @@
 package com.example.herb.util
 
-enum class SortType {
+enum class HerbSortType {
     ID,
     NAME,
     AVG_PRICE,

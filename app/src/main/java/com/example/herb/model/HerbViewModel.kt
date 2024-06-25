@@ -8,7 +8,7 @@ import com.example.herb.database.entity.Herb
 import com.example.herb.event.HerbEvent
 import com.example.herb.state.HerbQuerySort
 import com.example.herb.state.HerbState
-import com.example.herb.util.SortType
+import com.example.herb.util.HerbSortType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,11 +30,11 @@ class HerbViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _herbs = _querySort
         .flatMapLatest { querySort ->
-            when (querySort.sortType) {
-                SortType.ID -> dao.getHerbsHasStringOrderByID(querySort.stringQuery)
-                SortType.NAME -> dao.getHerbsHasStringOrderByName(querySort.stringQuery)
-                SortType.AVG_PRICE -> dao.getHerbsHasStringOrderByAvgPrice(querySort.stringQuery)
-                SortType.WEIGHT -> dao.getHerbsHasStringOrderByWeight(querySort.stringQuery)
+            when (querySort.herbSortType) {
+                HerbSortType.ID -> dao.getHerbsHasStringOrderByID(querySort.stringQuery)
+                HerbSortType.NAME -> dao.getHerbsHasStringOrderByName(querySort.stringQuery)
+                HerbSortType.AVG_PRICE -> dao.getHerbsHasStringOrderByAvgPrice(querySort.stringQuery)
+                HerbSortType.WEIGHT -> dao.getHerbsHasStringOrderByWeight(querySort.stringQuery)
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
@@ -133,6 +133,10 @@ class HerbViewModel @Inject constructor(
                         totalWeight = event.totalWeight
                     )
                 }
+            }
+
+            is HerbEvent.SetHerbQuerySort -> {
+                _querySort.update { event.querySort }
             }
         }
     }

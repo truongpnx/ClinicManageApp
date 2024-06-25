@@ -12,4 +12,5 @@ sealed interface HerbEvent {
     data object HideDialog: HerbEvent
     data class DeleteHerb(val herb: Herb): HerbEvent
     data class FindHerbs(val querySort: HerbQuerySort): HerbEvent
+    data class SetHerbQuerySort(val querySort: HerbQuerySort): HerbEvent
 }
