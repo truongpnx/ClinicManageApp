@@ -1,32 +1,37 @@
 package com.example.herb.helper
 
-import kotlin.math.ceil
-import kotlin.math.floor
+import android.annotation.SuppressLint
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
+import java.util.Locale
 
 interface StringHelper {
 
-    fun numberToVND(number: Number): String
+    fun numberToCurrency(number: Number, currencySymbols: String): String
 
-    fun numberToFloorWeight(number: Number, weightUnit: String): String
+    fun floatToString(number: Float, digitAfterPoint: Int): String
 
     fun numberToString(number: Number, prefix: String, postfix: String): String
 
     fun toProperCase(string: String): String
 
     companion object: StringHelper {
-        override fun numberToVND(number: Number): String {
-            var normNum = ceil(number.toFloat()).toInt()
-            var res = ""
-            while (normNum > 1000) {
-                res += ".000"
-                normNum /= 1000
+        override fun numberToCurrency(number: Number, currencySymbols: String): String {
+            val decimalFormatSymbols = DecimalFormatSymbols().apply {
+                currencySymbol = currencySymbols
+                groupingSeparator = '.'
+                decimalSeparator = ','
+
             }
-            res = normNum.toString() + res
-            return "$res,00 VND"
+            val decimalFormat = DecimalFormat.getCurrencyInstance() as DecimalFormat
+            decimalFormat.decimalFormatSymbols = decimalFormatSymbols
+            return decimalFormat.format(number)
         }
 
-        override fun numberToFloorWeight(number: Number, weightUnit: String): String {
-            return floor(number.toFloat()).toInt().toString() + " ($weightUnit)"
+        @SuppressLint("DefaultLocale")
+        override fun floatToString(number: Float, digitAfterPoint: Int): String {
+            return String.format("%.${digitAfterPoint}f", number)
         }
 
         override fun numberToString(number: Number, prefix: String, postfix: String): String {

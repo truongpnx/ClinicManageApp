@@ -32,8 +32,8 @@ interface StoreHerbDao {
     @Query("SELECT A.preID, A.patientID " +
             "FROM prescription as A INNER JOIN prescriptionherb as B " +
             "ON A.preID = B.preID " +
-            "WHERE A.preID = :preID")
-    fun getPrescriptions(preID: Int): Flow<List<Prescription>>
+            "WHERE B.herbID = :herbID")
+    fun getPrescriptions(herbID: Int): Flow<List<Prescription>>
 
     @Query("SELECT * FROM storedherb WHERE storeID = :storeID")
     fun getStoredHerb(storeID: Int): StoredHerb

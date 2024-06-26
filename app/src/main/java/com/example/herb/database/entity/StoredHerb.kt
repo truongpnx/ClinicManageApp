@@ -21,8 +21,10 @@ data class StoredHerb(
 
     // when preprocess herb and store
     val processTime: Float,
+    val laborCost: Long,
     val storeWeight: Float,
-    val additionalCost: Long
+    val additionalCost: Long,
+    val isImport: Boolean
 // sellPrice = F * (buyWeight * buyPrice + additionalCost + processTime * Cong)/ storeWeight
 )
 

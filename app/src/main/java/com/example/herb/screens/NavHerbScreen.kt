@@ -60,6 +60,8 @@ import com.example.herb.event.HerbEvent
 import com.example.herb.helper.StringHelper
 import com.example.herb.state.HerbState
 import com.example.herb.util.HerbSortType
+import com.example.herb.util.IntentExtraName
+import java.util.Locale
 
 @Composable
 fun HerbScreen(
@@ -166,6 +168,7 @@ fun AddHerbRow(
             }
 
             if (isExpand) {
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -175,7 +178,7 @@ fun AddHerbRow(
                         fontSize = 16.sp,
                     )
                     Text(
-                        text = StringHelper.numberToString(herb.avgPrice, "", " VND/g"),
+                        text = StringHelper.numberToCurrency(herb.avgPrice, "") + " VND/g",
                         modifier = Modifier.weight(1f),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Right,
@@ -192,7 +195,7 @@ fun AddHerbRow(
                         fontSize = 16.sp,
                     )
                     Text(
-                        text = StringHelper.numberToFloorWeight(herb.totalWeight, "g"),
+                        text = StringHelper.floatToString(herb.totalWeight, 1) + " (g)",
                         modifier = Modifier.weight(1f),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Right,
@@ -209,7 +212,7 @@ fun AddHerbRow(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = StringHelper.numberToVND(herb.avgPrice * herb.totalWeight),
+                        text = StringHelper.numberToCurrency (herb.avgPrice.toFloat() * herb.totalWeight, "") + " VND",
                         modifier = Modifier.weight(1f),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Right,
@@ -225,6 +228,10 @@ fun AddHerbRow(
                     val context = LocalContext.current
                     Button(onClick = {
                         val intent = Intent(context, HerbDetailActivity::class.java)
+                        intent.putExtra(IntentExtraName.HERB_ID, herb.herbID)
+                        intent.putExtra(IntentExtraName.HERB_NAME, herb.herbName)
+                        intent.putExtra(IntentExtraName.HERB_WEIGHT, herb.totalWeight)
+                        intent.putExtra(IntentExtraName.HERB_PRICE, herb.avgPrice)
                         context.startActivity(intent)
                     }) {
                         Text(text = stringResource(id = R.string.detail))

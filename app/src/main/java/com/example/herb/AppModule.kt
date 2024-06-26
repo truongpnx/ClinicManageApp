@@ -4,9 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import com.example.herb.database.HerbDatabase
 import com.example.herb.database.dao.HerbDao
-import com.example.herb.database.entity.Herb
-import com.example.herb.factory.HerbDetailViewModelAssistedFactory
-import com.example.herb.model.HerbDetailViewModel
+import com.example.herb.database.dao.StoreHerbDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,10 +33,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideHerbDetailViewModelAssistedFactory (
-        factory: HerbDetailViewModelAssistedFactory
-    ): (Herb) -> HerbDetailViewModel = {
-        it -> factory.create(it)
+    fun provideStoredHerbDao(db: HerbDatabase): StoreHerbDao {
+        return db.storedHerbDao()
     }
 
 }

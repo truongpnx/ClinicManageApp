@@ -11,8 +11,10 @@ data class HerbDetailState (
     val buyWeight: Float = 0f,
 
     val processTime: Float = 0f,
+    val laborCost: Long = 0,
     val storeWeight: Float = 0f,
     val additionalCost: Long = 0,
+    val isImport: Boolean = true,
 
     val prescriptions: List<Prescription> = emptyList(),
     val isDialogOn: Boolean = false,

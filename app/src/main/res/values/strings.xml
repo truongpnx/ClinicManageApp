@@ -20,5 +20,16 @@
     <string name="none_type">None</string>
     <string name="sort_by">Sort by</string>
     <string name="total_money_of">Total money of</string>
-
+    <string name="export_herb">Export</string>
+    <string name="import_herb">Import</string>
+    <string name="herb_history">Herb History</string>
+    <string name="date">Date</string>
+    <string name="buy_weight">Bought weight</string>
+    <string name="buy_price">Bought Price</string>
+    <string name="sell_price">Sold Price</string>
+    <string name="store_weight">Stored Weight</string>
+    <string name="sell_weight">Sold Weight</string>
+    <string name="process_time">Process Time</string>
+    <string name="labor_cost">Labor Cost</string>
+    <string name="additional_cost">Additional Cost</string>
 </resources>
