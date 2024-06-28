@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.sql.Date
 
 @Entity(
     foreignKeys = [
@@ -15,7 +16,7 @@ data class StoredHerb(
     @PrimaryKey(autoGenerate = true) val storeID: Int = 0,
     val herbID: Int,
     // when buy herb
-    val buyDate: String,
+    val buyDate: Long,
     val buyPrice: Long,
     val buyWeight: Float,
 

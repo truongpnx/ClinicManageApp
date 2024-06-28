@@ -61,7 +61,6 @@ import com.example.herb.helper.StringHelper
 import com.example.herb.state.HerbState
 import com.example.herb.util.HerbSortType
 import com.example.herb.util.IntentExtraName
-import java.util.Locale
 
 @Composable
 fun HerbScreen(
@@ -157,9 +156,13 @@ fun AddHerbRow(
                     modifier = Modifier.weight(1f)
                 )
 
-                if (!isExpand) {
+                if (!isExpand && herb.avgPrice != null && herb.totalWeight != null) {
                     Text(
-                        text = StringHelper.numberToString(herb.avgPrice, "", " VND/g"),
+                        text = StringHelper.numberToString(
+                            number = herb.avgPrice,
+                            prefix = "",
+                            postfix = " VND/g"
+                        ),
                         fontSize = 10.sp,
                         color = Color.Yellow
                     )
@@ -167,7 +170,7 @@ fun AddHerbRow(
                 }
             }
 
-            if (isExpand) {
+            if (isExpand && herb.avgPrice != null && herb.totalWeight != null) {
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -178,7 +181,7 @@ fun AddHerbRow(
                         fontSize = 16.sp,
                     )
                     Text(
-                        text = StringHelper.numberToCurrency(herb.avgPrice, "") + " VND/g",
+                        text = StringHelper.numberToFormattedString(herb.avgPrice, "") + " VND/g",
                         modifier = Modifier.weight(1f),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Right,
@@ -212,7 +215,10 @@ fun AddHerbRow(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = StringHelper.numberToCurrency (herb.avgPrice.toFloat() * herb.totalWeight, "") + " VND",
+                        text = StringHelper.numberToFormattedString(
+                            herb.avgPrice.toFloat() * herb.totalWeight,
+                            ""
+                        ) + " VND",
                         modifier = Modifier.weight(1f),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Right,
@@ -220,6 +226,8 @@ fun AddHerbRow(
                         color = LocalContentColor.current.copy(alpha = 0.8f)
                     )
                 }
+            }
+            if (isExpand) {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
@@ -464,7 +472,8 @@ fun NavHerbScreenFooter(state: HerbState) {
             )
             var totalMoney = 0f
             state.herbs.forEach {
-                totalMoney += it.avgPrice * it.totalWeight
+                if (it.avgPrice != null && it.totalWeight != null)
+                    totalMoney += it.avgPrice * it.totalWeight
             }
             Text(
                 text = StringHelper.numberToString(totalMoney, "", " VND"),

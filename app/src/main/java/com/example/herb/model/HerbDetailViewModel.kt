@@ -9,12 +9,12 @@ import com.example.herb.database.dao.StoreHerbDao
 import com.example.herb.database.entity.Herb
 import com.example.herb.database.entity.StoredHerb
 import com.example.herb.event.StoredHerbEvent
+import com.example.herb.helper.TimeHelper
 import com.example.herb.state.HerbDetailState
 import com.example.herb.util.StoredHerbSortType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,6 +23,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import kotlin.math.ceil
 
 //@HiltViewModel(assistedFactory = HerbDetailViewModel.HerbDetailViewModelFactory::class)
@@ -79,24 +82,37 @@ class HerbDetailViewModel @AssistedInject constructor(
             }
 
             StoredHerbEvent.SaveStoredHerb -> {
-                val buyDate = state.value.buyDate
-                val buyPrice = state.value.buyPrice
-                val buyWeight = state.value.buyWeight
-                val storeWeight = state.value.storeWeight
-                val processTime = state.value.processTime
-                val additionalCost = state.value.additionalCost
-                val laborCost = state.value.laborCost
-                val isImport = state.value.isImport
 
-                if (buyDate.isBlank() || buyPrice == 0L || buyWeight < 0.01f || storeWeight > buyWeight || processTime < 0f || additionalCost < 0f || laborCost < 0) {
+                if (state.value.buyPriceL.isBlank()
+                    || state.value.buyWeightF.isBlank()
+                    || state.value.storeWeightF.isBlank()
+                    || state.value.processTimeF.isBlank()
+                    || state.value.additionalCostL.isBlank()
+                    || state.value.laborCostL.isBlank()
+                ) {
                     Log.d("HerbDetailViewModel", "onEvent: Error on Store Herb")
                     return
                 }
 
+                val buyTime = state.value.buyTime
+                val buyLocalDate = state.value.buyLocalDate
+                val buyPrice = state.value.buyPriceL.toLong()
+                val buyWeight = state.value.buyWeightF.toFloat()
+                val storeWeight = state.value.storeWeightF.toFloat()
+                val processTime = state.value.processTimeF.toFloat()
+                val additionalCost = state.value.additionalCostL.toLong()
+                val laborCost = state.value.laborCostL.toLong()
+                val isImport = state.value.isImport
+
+                val buyDate =
+                    TimeHelper.localDateClockToDate(localDate = buyLocalDate, localTime = buyTime)
+
                 val totalCost =
-                    herb.totalWeight * herb.avgPrice + processTime * laborCost + additionalCost + buyWeight * buyPrice
-                Log.d("HerbDetailViewModel", "onEvent: totalCost = $totalCost")
-                val totalWeight = herb.totalWeight + storeWeight
+                    (herb.totalWeight ?: 0f) * (herb.avgPrice
+                        ?: 0) + processTime * laborCost + additionalCost + buyWeight * buyPrice
+//                Log.d("HerbDetailViewModel", "onEvent: totalCost = $totalCost")
+                val deltaWeight = if (isImport) storeWeight else -storeWeight
+                val totalWeight = deltaWeight + (herb.totalWeight ?: 0f)
 
                 val newHerb = Herb(
                     herbID = herb.herbID,
@@ -107,7 +123,12 @@ class HerbDetailViewModel @AssistedInject constructor(
 
                 val storeHerb = StoredHerb(
                     herbID = herb.herbID,
-                    buyDate = buyDate,
+                    buyDate = TimeHelper.utilDateToSqlLong(
+                        TimeHelper.convertToUTC(
+                            buyDate,
+                            ZoneId.systemDefault()
+                        )
+                    ),
                     buyPrice = buyPrice,
                     buyWeight = buyWeight,
                     storeWeight = storeWeight,
@@ -122,32 +143,25 @@ class HerbDetailViewModel @AssistedInject constructor(
                 }
                 _state.update {
                     it.copy(
-                        buyDate = "",
-                        buyPrice = 0,
-                        buyWeight = 0f,
-                        storeWeight = 0f,
-                        processTime = 0f,
-                        additionalCost = 0,
-                        laborCost = 0,
+                        buyTime = LocalTime.now(),
+                        buyLocalDate = LocalDate.now(),
+                        buyPriceL = "",
+                        buyWeightF = "",
+                        storeWeightF = "",
+                        processTimeF = "",
+                        additionalCostL = "",
+                        laborCostL = "",
                         isImport = true,
-                        isDialogOn = false
+                        isDialogOn = false,
+                        herb = newHerb
                     )
                 }
-
             }
 
             is StoredHerbEvent.SetAdditionalCost -> {
                 _state.update {
                     it.copy(
-                        additionalCost = event.additionalCost
-                    )
-                }
-            }
-
-            is StoredHerbEvent.SetBuyDate -> {
-                _state.update {
-                    it.copy(
-                        buyDate = event.buyDate
+                        additionalCostL = event.additionalCostL
                     )
                 }
             }
@@ -155,7 +169,7 @@ class HerbDetailViewModel @AssistedInject constructor(
             is StoredHerbEvent.SetBuyPrice -> {
                 _state.update {
                     it.copy(
-                        buyPrice = event.buyPrice
+                        buyPriceL = event.buyPriceL
                     )
                 }
             }
@@ -163,7 +177,7 @@ class HerbDetailViewModel @AssistedInject constructor(
             is StoredHerbEvent.SetBuyWeight -> {
                 _state.update {
                     it.copy(
-                        buyWeight = event.buyWeight
+                        buyWeightF = event.buyWeightF
                     )
                 }
             }
@@ -171,7 +185,7 @@ class HerbDetailViewModel @AssistedInject constructor(
             is StoredHerbEvent.SetProcessTime -> {
                 _state.update {
                     it.copy(
-                        processTime = event.processTime
+                        processTimeF = event.processTimeF
                     )
                 }
             }
@@ -179,15 +193,7 @@ class HerbDetailViewModel @AssistedInject constructor(
             is StoredHerbEvent.SetStoreWeight -> {
                 _state.update {
                     it.copy(
-                        storeWeight = event.storeWeight
-                    )
-                }
-            }
-
-            StoredHerbEvent.ShowDialog -> {
-                _state.update {
-                    it.copy(
-                        isDialogOn = true
+                        storeWeightF = event.storeWeightF
                     )
                 }
             }
@@ -199,7 +205,11 @@ class HerbDetailViewModel @AssistedInject constructor(
             StoredHerbEvent.ExportHerb -> {
                 _state.update {
                     it.copy(
-                        isImport = false
+                        isImport = false,
+                        isDialogOn = true,
+                        processTimeF = "0.0",
+                        additionalCostL = "0",
+                        laborCostL = "0"
                     )
                 }
             }
@@ -207,7 +217,8 @@ class HerbDetailViewModel @AssistedInject constructor(
             StoredHerbEvent.ImportHerb -> {
                 _state.update {
                     it.copy(
-                        isImport = true
+                        isImport = true,
+                        isDialogOn = true
                     )
                 }
             }
@@ -215,7 +226,33 @@ class HerbDetailViewModel @AssistedInject constructor(
             is StoredHerbEvent.SetLaborCost -> {
                 _state.update {
                     it.copy(
-                        laborCost = event.laborCost
+                        laborCostL = event.laborCostL
+                    )
+                }
+            }
+
+            is StoredHerbEvent.SetBuyLocalDate -> {
+                _state.update {
+                    it.copy(
+                        buyLocalDate = event.localDate
+                    )
+                }
+            }
+
+            is StoredHerbEvent.SetBuyTime -> {
+                _state.update {
+                    it.copy(
+                        buyTime = event.buyTime
+                    )
+                }
+            }
+
+            is StoredHerbEvent.SetSellValue -> {
+                _state.update {
+                    it.copy(
+                        buyWeightF = event.sellWeightF,
+                        storeWeightF = event.sellWeightF,
+                        buyPriceL = event.sellPriceL
                     )
                 }
             }
@@ -233,7 +270,7 @@ class HerbDetailViewModel @AssistedInject constructor(
         fun providesFactory(
             assistedFactory: HerbDetailViewModelFactory,
             herb: Herb
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory{
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(herb) as T
             }

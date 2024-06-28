@@ -1,14 +1,13 @@
 package com.example.herb.helper
 
 import android.annotation.SuppressLint
+import android.util.Log
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
-import java.text.NumberFormat
-import java.util.Locale
 
 interface StringHelper {
 
-    fun numberToCurrency(number: Number, currencySymbols: String): String
+    fun numberToFormattedString(number: Number, pattern: String = "#,###.##"): String
 
     fun floatToString(number: Float, digitAfterPoint: Int): String
 
@@ -16,16 +15,17 @@ interface StringHelper {
 
     fun toProperCase(string: String): String
 
-    companion object: StringHelper {
-        override fun numberToCurrency(number: Number, currencySymbols: String): String {
+    fun stringToNumber(string: String, pattern: String = "#,###.##"): Number
+
+    fun splitStringFloatPattern(string: String): Pair<String, String>
+
+    companion object : StringHelper {
+        override fun numberToFormattedString(number: Number, pattern: String): String {
             val decimalFormatSymbols = DecimalFormatSymbols().apply {
-                currencySymbol = currencySymbols
                 groupingSeparator = '.'
                 decimalSeparator = ','
-
             }
-            val decimalFormat = DecimalFormat.getCurrencyInstance() as DecimalFormat
-            decimalFormat.decimalFormatSymbols = decimalFormatSymbols
+            val decimalFormat = DecimalFormat(pattern, decimalFormatSymbols)
             return decimalFormat.format(number)
         }
 
@@ -45,5 +45,28 @@ interface StringHelper {
                 }
             }
         }
+
+        override fun stringToNumber(string: String, pattern: String): Number {
+            val decimalFormatSymbols = DecimalFormatSymbols().apply {
+                groupingSeparator = '.'
+                decimalSeparator = ','
+            }
+            val decimalFormat = DecimalFormat(pattern, decimalFormatSymbols)
+            return decimalFormat.parse(string) ?: 0
+        }
+
+        override fun splitStringFloatPattern(string: String): Pair<String, String> {
+            val regex = """(\d*)(\.(\d*))?""".toRegex()
+            val matchResult = regex.matchEntire(string)
+            return if (matchResult != null) {
+                Log.d("splitStringFloatPattern: ", matchResult.groupValues.joinToString(","))
+                val naturalPart = matchResult.groupValues[1].ifEmpty { "" }
+                val decimalPart = matchResult.groupValues[3].ifEmpty { "" }
+                Pair(naturalPart, decimalPart)
+            } else {
+                Pair("", "")
+            }
+        }
+
     }
 }

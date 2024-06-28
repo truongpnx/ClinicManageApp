@@ -1,5 +1,6 @@
 package com.example.herb.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -35,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,66 +48,83 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.example.herb.R
-import com.example.herb.database.entity.Herb
 import com.example.herb.database.entity.StoredHerb
+import com.example.herb.dialog.ExportHerbDetailDialog
+import com.example.herb.dialog.ImportHerbDetailDialog
 import com.example.herb.dialog.ReadExportHerbDetailHistoryDialog
 import com.example.herb.dialog.ReadImportHerbDetailHistoryDialog
 import com.example.herb.event.StoredHerbEvent
 import com.example.herb.helper.StringHelper
+import com.example.herb.helper.TimeHelper
 import com.example.herb.state.HerbDetailState
+import com.example.herb.util.StoredHerbSortType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HerbDetailScreen(
-    state: HerbDetailState,
-    onEvent: (StoredHerbEvent) -> Unit,
-    modifier: Modifier = Modifier
+    state: HerbDetailState, onEvent: (StoredHerbEvent) -> Unit, modifier: Modifier = Modifier
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
-    val scope = rememberCoroutineScope()
 
     BottomSheetScaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         scaffoldState = scaffoldState,
-        topBar = { HerbDetailHeader() },
-        sheetContent = { HerbDetailFooter() },
+        sheetContent = { HerbDetailFooter(state, onEvent) },
     ) {
+
+        if (state.isDialogOn) {
+            if (state.isImport) ImportHerbDetailDialog(state = state, onEvent = onEvent)
+            else ExportHerbDetailDialog(state = state, onEvent = onEvent)
+        }
+
         Column(
             modifier = Modifier
                 .padding(it)
                 .fillMaxWidth()
         ) {
-            HistoryStoreHerb()
+            HerbDetailHeader()
+            HistoryStoreHerb(state, onEvent)
         }
     }
 }
 
 @Composable
 fun HerbDetailHeader() {
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = "Herb Detail",
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
-        textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.headlineLarge.fontSize
-    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = LocalContentColor.current.copy(
+                    alpha = 0.4f,
+                    blue = 0.2f,
+                    green = 0.8f,
+                    red = 0f
+                ),
+                shape = RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 10.dp)
+            )
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 40.dp, bottom = 10.dp),
+            text = "Herb Detail",
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            fontSize = MaterialTheme.typography.headlineLarge.fontSize,
+        )
+    }
 }
 
 
-@Preview
 @Composable
-fun HerbDetailFooter() {
-    val herb = Herb(
-        herbName = "Name",
-        totalWeight = 500.5f,
-        avgPrice = 100000L
-    )
+fun HerbDetailFooter(
+    state: HerbDetailState, onEvent: (StoredHerbEvent) -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -126,19 +144,20 @@ fun HerbDetailFooter() {
 
             Button(
                 modifier = Modifier.fillMaxWidth(.45f),
-                onClick = { /*TODO*/ },
+                onClick = { onEvent(StoredHerbEvent.ExportHerb) },
                 colors = ButtonDefaults.buttonColors().copy(
                     containerColor = Color.Red,
                     contentColor = Color.White,
                 ),
                 shape = RoundedCornerShape(10.dp),
+                enabled = state.herb!!.totalWeight != null && state.herb.avgPrice != null
             ) {
                 Text(text = stringResource(id = R.string.export_herb))
             }
 
             Button(
                 modifier = Modifier.fillMaxWidth(.8f),
-                onClick = { /*TODO*/ },
+                onClick = { onEvent(StoredHerbEvent.ImportHerb) },
                 colors = ButtonDefaults.buttonColors().copy(
                     containerColor = Color.Green,
                     contentColor = Color.White,
@@ -151,6 +170,8 @@ fun HerbDetailFooter() {
 
         }
 
+        if (state.herb!!.totalWeight == null || state.herb.avgPrice == null) return
+
         Row(
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -160,13 +181,14 @@ fun HerbDetailFooter() {
                 fontSize = 16.sp,
             )
             Text(
-                text = StringHelper.numberToCurrency(herb.avgPrice, "") + " VND/g",
+                text = StringHelper.numberToFormattedString(state.herb.avgPrice, "") + " VND/g",
                 modifier = Modifier.weight(1f),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Right,
                 color = LocalContentColor.current.copy(alpha = 0.8f)
             )
         }
+
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -177,7 +199,7 @@ fun HerbDetailFooter() {
                 fontSize = 16.sp,
             )
             Text(
-                text = StringHelper.floatToString(herb.totalWeight, 1) + " (g)",
+                text = StringHelper.floatToString(state.herb.totalWeight!!, 1) + " (g)",
                 modifier = Modifier.weight(1f),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Right,
@@ -194,9 +216,8 @@ fun HerbDetailFooter() {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = StringHelper.numberToCurrency(
-                    herb.avgPrice.toFloat() * herb.totalWeight,
-                    ""
+                text = StringHelper.numberToFormattedString(
+                    state.herb.avgPrice.toFloat() * state.herb.totalWeight!!, ""
                 ) + " VND",
                 modifier = Modifier.weight(1f),
                 fontSize = 16.sp,
@@ -210,8 +231,7 @@ fun HerbDetailFooter() {
 
 @Composable
 fun MyDropDownBar(
-    valueList: List<Pair<String, () -> Unit>>,
-    modifier: Modifier = Modifier
+    valueList: List<Pair<String, () -> Unit>>, modifier: Modifier = Modifier
 ) {
     if (valueList.isEmpty()) return
 
@@ -222,14 +242,11 @@ fun MyDropDownBar(
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
     // Up Icon when expanded and down icon when collapsed
-    val icon = if (isExpand)
-        Icons.Filled.KeyboardArrowUp
-    else
-        Icons.Filled.KeyboardArrowDown
+    val icon = if (isExpand) Icons.Filled.KeyboardArrowUp
+    else Icons.Filled.KeyboardArrowDown
 
     Column(modifier = modifier) {
-        OutlinedTextField(
-            value = selectedText,
+        OutlinedTextField(value = selectedText,
             readOnly = true,
             onValueChange = { selectedText = it },
             modifier = Modifier
@@ -240,35 +257,30 @@ fun MyDropDownBar(
                     textFieldSize = coordinates.size.toSize()
                 },
             trailingIcon = {
-                Icon(icon, "contentDescription",
-                    Modifier.clickable { isExpand = !isExpand })
-            }
-        )
+                Icon(icon, "contentDescription", Modifier.clickable { isExpand = !isExpand })
+            })
 
         DropdownMenu(
             expanded = isExpand,
             onDismissRequest = { isExpand = false },
-            modifier = Modifier
-                .width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+            modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
         ) {
             valueList.forEach { pair ->
                 DropdownMenuItem(onClick = {
                     selectedText = pair.first
                     isExpand = false
                     pair.second.invoke()
-                },
-                    text = { Text(text = pair.first) }
-                )
+                }, text = { Text(text = pair.first) })
             }
         }
     }
 }
 
 
-@Preview
 @Composable
-fun HistoryStoreHerb() {
-    // TODO change back to false
+fun HistoryStoreHerb(
+    state: HerbDetailState, onEvent: (StoredHerbEvent) -> Unit
+) {
     var isExpand by remember { mutableStateOf(true) }
 
     Column(
@@ -299,20 +311,18 @@ fun HistoryStoreHerb() {
 
         if (isExpand) {
 
-            val valueList = listOf(
-                Pair<String, () -> Unit>(
-                    stringResource(id = R.string.date)
-                ) { TODO() },
+            val valueList = listOf(Pair(
+                stringResource(id = R.string.date)
+            ) { onEvent(StoredHerbEvent.SetSortType(StoredHerbSortType.DATE)) },
 //                Pair<String, () -> Unit>(
 //                    stringResource(id = R.string.buy_price)
 //                ) { TODO() },
 //                Pair<String, () -> Unit>(
 //                    stringResource(id = R.string.buy_weight)
 //                ) { TODO() },
-                Pair<String, () -> Unit>(
+                Pair(
                     stringResource(id = R.string.store_weight)
-                ) { TODO() }
-            )
+                ) { onEvent(StoredHerbEvent.SetSortType(StoredHerbSortType.STORE_WEIGHT)) })
 
             MyDropDownBar(valueList = valueList, modifier = Modifier.fillMaxWidth())
 
@@ -327,28 +337,17 @@ fun HistoryStoreHerb() {
                     .fillMaxSize()
                     .padding(2.dp)
                     .border(
-                        width = 1.dp, color = Color.Gray,
-                        shape = RoundedCornerShape(8.dp)
+                        width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp)
                     )
             ) {
-                val storedHerb = StoredHerb(
-                    herbID = 0,
-                    buyDate = "22/06/2024",
-                    buyPrice = 5000L,
-                    buyWeight = 1000f,
-                    processTime = 1f,
-                    laborCost = 50000,
-                    storeWeight = 500f,
-                    additionalCost = 4000,
-                    isImport = true
-                )
                 LazyColumn(
                     Modifier.fillMaxWidth()
                 ) {
-
+                    items(state.storedHerbs) {
+                        HerbDetailHistoryRow(it)
+                    }
                 }
 
-                HerbDetailHistoryRow(storedHerb = storedHerb)
             }
         }
 
@@ -356,38 +355,36 @@ fun HistoryStoreHerb() {
 
 }
 
-
 @Composable
 fun HerbDetailHistoryRow(storedHerb: StoredHerb) {
+    Log.d("HerbDetailScreen", "HerbDetailHistoryRow: ${storedHerb.storeID}")
+
     var showDialog by remember { mutableStateOf(false) }
 
-    val color = if (storedHerb.isImport)
-        Color.Green.copy(alpha = 0.8f)
+    val color = if (storedHerb.isImport) Color.Green.copy(alpha = 0.8f)
     else Color.Red.copy(alpha = 0.8f)
     val prefix = if (storedHerb.isImport) "" else "-"
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { showDialog = true }
-            .border(width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(5.dp)),
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)
+        .clickable { showDialog = true }
+        .border(width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(5.dp)),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+        verticalAlignment = Alignment.CenterVertically) {
 
         Text(
-            modifier = Modifier
-                .padding(8.dp),
-            text = storedHerb.buyDate,
+            modifier = Modifier.padding(8.dp),
+            text = TimeHelper.localDateToString(
+                TimeHelper.longToUtilDate(storedHerb.buyDate)
+            ),
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
             textAlign = TextAlign.Right,
             color = LocalContentColor.current.copy(alpha = 0.8f)
         )
 
         Text(
-            modifier = Modifier
-                .padding(8.dp),
+            modifier = Modifier.padding(8.dp),
             text = prefix + StringHelper.floatToString(storedHerb.storeWeight, 1) + " (g)",
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
             textAlign = TextAlign.Right,
@@ -397,38 +394,19 @@ fun HerbDetailHistoryRow(storedHerb: StoredHerb) {
 
     if (showDialog) {
         if (storedHerb.isImport) {
-            ReadImportHerbDetailHistoryDialog(storedHerb = storedHerb) {
-                showDialog = false
-            }
-        }
-        else {
-            ReadExportHerbDetailHistoryDialog(storedHerb = storedHerb) {
-                showDialog = false
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun PreviewHerbDetailScreen() {
-    val scaffoldState = rememberBottomSheetScaffoldState()
-    val scope = rememberCoroutineScope()
-
-    BottomSheetScaffold(
-        modifier = Modifier.fillMaxSize(),
-        scaffoldState = scaffoldState,
-        topBar = { HerbDetailHeader() },
-        sheetContent = { HerbDetailFooter() },
-
-        ) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxWidth()
-        ) {
-            HistoryStoreHerb()
+            ReadImportHerbDetailHistoryDialog(
+                storedHerb = storedHerb,
+                onDismiss = {
+                    showDialog = false
+                }
+            )
+        } else {
+            ReadExportHerbDetailHistoryDialog(
+                storedHerb = storedHerb,
+                onDismiss = {
+                    showDialog = false
+                }
+            )
         }
     }
 }

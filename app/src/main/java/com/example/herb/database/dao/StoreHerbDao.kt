@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.herb.database.entity.Herb
 import com.example.herb.database.entity.Prescription
 import com.example.herb.database.entity.StoredHerb
 import kotlinx.coroutines.flow.Flow
@@ -17,17 +16,17 @@ interface StoreHerbDao {
     @Delete
     suspend fun deleteStoredHerb(storedHerb: StoredHerb)
 
-    @Query("SELECT * FROM storedherb WHERE storeID = :storeID ORDER BY buyDate DESC ")
-    fun getStoredHerbByIDOrderByDate(storeID: Int): Flow<List<StoredHerb>>
+    @Query("SELECT * FROM storedherb WHERE herbID = :herbID ORDER BY buyDate DESC ")
+    fun getStoredHerbByIDOrderByDate(herbID: Int): Flow<List<StoredHerb>>
 
-    @Query("SELECT * FROM storedherb WHERE storeID = :storeID ORDER BY buyPrice DESC ")
-    fun getStoredHerbByIDOrderByBuyPrice(storeID: Int): Flow<List<StoredHerb>>
+    @Query("SELECT * FROM storedherb WHERE herbID = :herbID ORDER BY buyPrice DESC ")
+    fun getStoredHerbByIDOrderByBuyPrice(herbID: Int): Flow<List<StoredHerb>>
 
-    @Query("SELECT * FROM storedherb WHERE storeID = :storeID ORDER BY buyDate DESC ")
-    fun getStoredHerbByIDOrderByBuyWeight(storeID: Int): Flow<List<StoredHerb>>
+    @Query("SELECT * FROM storedherb WHERE herbID = :herbID ORDER BY buyWeight DESC ")
+    fun getStoredHerbByIDOrderByBuyWeight(herbID: Int): Flow<List<StoredHerb>>
 
-    @Query("SELECT * FROM storedherb WHERE storeID = :storeID ORDER BY buyDate DESC ")
-    fun getStoredHerbByIDOrderByStoreWeight(storeID: Int): Flow<List<StoredHerb>>
+    @Query("SELECT * FROM storedherb WHERE herbID = :herbID ORDER BY storeWeight DESC ")
+    fun getStoredHerbByIDOrderByStoreWeight(herbID: Int): Flow<List<StoredHerb>>
 
     @Query("SELECT A.preID, A.patientID " +
             "FROM prescription as A INNER JOIN prescriptionherb as B " +

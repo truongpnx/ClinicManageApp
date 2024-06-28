@@ -28,19 +28,19 @@ class HerbDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        var herb = Herb(
+        val herb = Herb(
             herbID = intent.getIntExtra(IntentExtraName.HERB_ID, 0),
             herbName = intent.getStringExtra(IntentExtraName.HERB_NAME)!!,
             totalWeight = intent.getFloatExtra(IntentExtraName.HERB_WEIGHT, 0f),
             avgPrice = intent.getLongExtra(IntentExtraName.HERB_PRICE, 0),
         )
-        viewModel = ViewModelProvider(this, HerbDetailViewModel.providesFactory(herbDetailViewModelFactory, herb))
-            .get(HerbDetailViewModel::class.java)
+        viewModel = ViewModelProvider(this, HerbDetailViewModel.providesFactory(herbDetailViewModelFactory, herb))[HerbDetailViewModel::class.java]
 
         setContent {
             val state by viewModel.state.collectAsState()
+
             HerbTheme {
-                HerbDetailScreen(state, viewModel::onEvent, Modifier.fillMaxSize())
+                HerbDetailScreen(state.copy(herb = herb), viewModel::onEvent, Modifier.fillMaxSize())
             }
         }
     }

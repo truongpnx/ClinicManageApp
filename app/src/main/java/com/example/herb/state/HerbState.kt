@@ -6,8 +6,8 @@ import com.example.herb.util.HerbSortType
 data class HerbState (
     val herbs: List<Herb> = emptyList(),
     val herbName: String = "",
-    val avgPrice: Long = 0,
-    val totalWeight: Float = 0f,
+    val avgPrice: Long? = null,
+    val totalWeight: Float? = null,
     val querySort: HerbQuerySort = HerbQuerySort(),
     val isAddingHerb: Boolean = false,
 )

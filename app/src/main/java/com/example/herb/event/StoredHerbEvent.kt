@@ -2,19 +2,22 @@ package com.example.herb.event
 
 import com.example.herb.database.entity.StoredHerb
 import com.example.herb.util.StoredHerbSortType
+import java.time.LocalDate
+import java.time.LocalTime
 
 sealed interface StoredHerbEvent {
     data object SaveStoredHerb: StoredHerbEvent
-    data class SetBuyDate(val buyDate: String): StoredHerbEvent
-    data class SetBuyPrice(val buyPrice: Long): StoredHerbEvent
-    data class SetBuyWeight(val buyWeight: Float): StoredHerbEvent
-    data class SetProcessTime(val processTime: Float): StoredHerbEvent
-    data class SetLaborCost(val laborCost: Long): StoredHerbEvent
-    data class SetStoreWeight(val storeWeight: Float): StoredHerbEvent
-    data class SetAdditionalCost(val additionalCost: Long): StoredHerbEvent
+    data class SetBuyLocalDate(val localDate: LocalDate): StoredHerbEvent
+    data class SetBuyTime(val buyTime: LocalTime): StoredHerbEvent
+    data class SetBuyPrice(val buyPriceL: String): StoredHerbEvent
+    data class SetBuyWeight(val buyWeightF: String): StoredHerbEvent
+    data class SetSellValue(val sellWeightF: String, val sellPriceL: String): StoredHerbEvent
+    data class SetProcessTime(val processTimeF: String): StoredHerbEvent
+    data class SetLaborCost(val laborCostL: String): StoredHerbEvent
+    data class SetStoreWeight(val storeWeightF: String): StoredHerbEvent
+    data class SetAdditionalCost(val additionalCostL: String): StoredHerbEvent
 
     data class SetSortType(val storedHerbSortType: StoredHerbSortType): StoredHerbEvent
-    data object ShowDialog: StoredHerbEvent
     data object HideDialog: StoredHerbEvent
     data object ExportHerb: StoredHerbEvent
     data object ImportHerb: StoredHerbEvent
