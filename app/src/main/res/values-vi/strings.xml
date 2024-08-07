@@ -25,5 +25,8 @@
     <string name="process_time">Thời Gian Sơ Chế</string>
     <string name="labor_cost">Giá Công</string>
     <string name="additional_cost">Phụ Phí</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
+    <string name="delete">Xóa</string>
 
 </resources>

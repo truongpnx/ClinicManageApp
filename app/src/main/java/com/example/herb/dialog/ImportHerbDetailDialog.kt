@@ -1,6 +1,5 @@
 package com.example.herb.dialog
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -186,7 +185,9 @@ fun ImportHerbDetailDialog(
                     fontWeight = FontWeight.Bold
                 )
 
-                FloatInputField(
+                FloatInputField(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                     value = state.buyWeightF,
                     onValueChange = { first, second ->
                         onEvent(
@@ -209,6 +210,9 @@ fun ImportHerbDetailDialog(
                 )
 
                 FloatInputField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                     value = state.processTimeF,
                     onValueChange = { first, second ->
                         onEvent(
@@ -279,6 +283,9 @@ fun ImportHerbDetailDialog(
                 )
 
                 FloatInputField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                     value = state.storeWeightF,
                     onValueChange = { first, second ->
                         onEvent(
@@ -303,7 +310,7 @@ fun ImportHerbDetailDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-                    text = StringHelper.numberToFormattedString(totalMoney, "") + " VND",
+                    text = StringHelper.numberToFormattedString(totalMoney) + " VND",
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                     textAlign = TextAlign.Center,
                     color = color

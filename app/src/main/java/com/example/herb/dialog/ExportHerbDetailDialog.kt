@@ -177,6 +177,9 @@ fun ExportHerbDetailDialog(
                 )
 
                 FloatInputField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                     value = state.buyWeightF,
                     onValueChange = { first, second ->
                         onEvent(
@@ -202,7 +205,7 @@ fun ExportHerbDetailDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-                    text = StringHelper.numberToFormattedString(totalMoney, "") + " VND",
+                    text = StringHelper.numberToFormattedString(totalMoney) + " VND",
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                     textAlign = TextAlign.Center,
                     color = color

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -181,7 +182,7 @@ fun AddHerbRow(
                         fontSize = 16.sp,
                     )
                     Text(
-                        text = StringHelper.numberToFormattedString(herb.avgPrice, "") + " VND/g",
+                        text = StringHelper.numberToFormattedString(herb.avgPrice) + " VND/g",
                         modifier = Modifier.weight(1f),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Right,
@@ -217,7 +218,6 @@ fun AddHerbRow(
                     Text(
                         text = StringHelper.numberToFormattedString(
                             herb.avgPrice.toFloat() * herb.totalWeight,
-                            ""
                         ) + " VND",
                         modifier = Modifier.weight(1f),
                         fontSize = 16.sp,
@@ -238,8 +238,8 @@ fun AddHerbRow(
                         val intent = Intent(context, HerbDetailActivity::class.java)
                         intent.putExtra(IntentExtraName.HERB_ID, herb.herbID)
                         intent.putExtra(IntentExtraName.HERB_NAME, herb.herbName)
-                        intent.putExtra(IntentExtraName.HERB_WEIGHT, herb.totalWeight)
-                        intent.putExtra(IntentExtraName.HERB_PRICE, herb.avgPrice)
+                        if(herb.totalWeight != null) intent.putExtra(IntentExtraName.HERB_WEIGHT, herb.totalWeight)
+                        if(herb.avgPrice != null) intent.putExtra(IntentExtraName.HERB_PRICE, herb.avgPrice)
                         context.startActivity(intent)
                     }) {
                         Text(text = stringResource(id = R.string.detail))
@@ -248,10 +248,36 @@ fun AddHerbRow(
             }
 
         }
+        
+        var showDeleteDialog by remember {
+            mutableStateOf(false)
+        }
+        
         IconButton(onClick = {
-            onEvent(HerbEvent.DeleteHerb(herb = herb))
+            showDeleteDialog = true 
         }) {
             Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete herb")
+        }
+        
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                confirmButton = {
+                    Button(onClick = { onEvent(HerbEvent.DeleteHerb(herb))}) {
+                        Text(text = stringResource(id = R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDeleteDialog = false }) {
+                        Text(text = stringResource(id = R.string.cancel))
+                    }
+                },
+                text = {
+                    Text(text = stringResource(id = R.string.delete) + " ${herb.herbName}?",
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                    )
+                }
+            )
         }
 
     }
@@ -476,7 +502,7 @@ fun NavHerbScreenFooter(state: HerbState) {
                     totalMoney += it.avgPrice * it.totalWeight
             }
             Text(
-                text = StringHelper.numberToString(totalMoney, "", " VND"),
+                text = StringHelper.numberToFormattedString(totalMoney) +" VND",
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 color = LocalContentColor.current.copy(alpha = 0.8f, blue = 0.8f),

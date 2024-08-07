@@ -1,5 +1,6 @@
 package com.example.herb.screens
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BottomSheetScaffold
@@ -43,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.example.herb.R
+import com.example.herb.database.entity.Herb
 import com.example.herb.database.entity.StoredHerb
 import com.example.herb.dialog.ExportHerbDetailDialog
 import com.example.herb.dialog.ImportHerbDetailDialog
@@ -68,6 +72,8 @@ import com.example.herb.util.StoredHerbSortType
 fun HerbDetailScreen(
     state: HerbDetailState, onEvent: (StoredHerbEvent) -> Unit, modifier: Modifier = Modifier
 ) {
+    if (state.herb == null) (LocalContext.current as Activity).finish()
+
     val scaffoldState = rememberBottomSheetScaffoldState()
 
     BottomSheetScaffold(
@@ -86,38 +92,50 @@ fun HerbDetailScreen(
                 .padding(it)
                 .fillMaxWidth()
         ) {
-            HerbDetailHeader()
+            HerbDetailHeader(herb = state.herb!!)
             HistoryStoreHerb(state, onEvent)
         }
     }
 }
 
 @Composable
-fun HerbDetailHeader() {
-    Box(
-        modifier = Modifier
+fun HerbDetailHeader(herb: Herb, modifier: Modifier = Modifier) {
+    val activity = LocalContext.current as Activity
+
+    Column(
+        modifier = modifier
             .fillMaxWidth()
             .background(
                 color = LocalContentColor.current.copy(
-                    alpha = 0.4f,
-                    blue = 0.2f,
-                    green = 0.8f,
-                    red = 0f
-                ),
-                shape = RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 10.dp)
-            )
+                    alpha = 0.4f, blue = 0.2f, green = 0.8f, red = 0f
+                ), shape = RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 10.dp)
+            ), horizontalAlignment = Alignment.Start
     ) {
         Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 40.dp, bottom = 10.dp),
-            text = "Herb Detail",
+            text = herb.herbName,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
             fontSize = MaterialTheme.typography.headlineLarge.fontSize,
         )
+
+        Button(
+            onClick = { activity.finish() },
+            colors = ButtonDefaults.buttonColors().copy(
+                containerColor = Color.Transparent, disabledContainerColor = Color.Transparent
+            ),
+
+            ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back"
+            )
+        }
     }
+
+
 }
 
 
@@ -125,6 +143,9 @@ fun HerbDetailHeader() {
 fun HerbDetailFooter(
     state: HerbDetailState, onEvent: (StoredHerbEvent) -> Unit
 ) {
+    val hasValue = state.herb!!.totalWeight != null && state.herb.avgPrice != null
+
+    Log.d("HerbDetailScreen", "HerbDetailFooter: ${state.herb}")
 
     Column(
         modifier = Modifier
@@ -150,7 +171,7 @@ fun HerbDetailFooter(
                     contentColor = Color.White,
                 ),
                 shape = RoundedCornerShape(10.dp),
-                enabled = state.herb!!.totalWeight != null && state.herb.avgPrice != null
+                enabled = hasValue
             ) {
                 Text(text = stringResource(id = R.string.export_herb))
             }
@@ -170,61 +191,64 @@ fun HerbDetailFooter(
 
         }
 
-        if (state.herb!!.totalWeight == null || state.herb.avgPrice == null) return
+        if (hasValue) {
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(id = R.string.avg_price),
-                fontSize = 16.sp,
-            )
-            Text(
-                text = StringHelper.numberToFormattedString(state.herb.avgPrice, "") + " VND/g",
-                modifier = Modifier.weight(1f),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Right,
-                color = LocalContentColor.current.copy(alpha = 0.8f)
-            )
-        }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.avg_price),
+                    fontSize = 16.sp,
+                )
+                Text(
+                    text = StringHelper.numberToFormattedString(
+                        state.herb.avgPrice ?: 0,
+                    ) + " VND/g",
+                    modifier = Modifier.weight(1f),
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Right,
+                    color = LocalContentColor.current.copy(alpha = 0.8f)
+                )
+            }
 
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(id = R.string.weight_remain),
-                fontSize = 16.sp,
-            )
-            Text(
-                text = StringHelper.floatToString(state.herb.totalWeight!!, 1) + " (g)",
-                modifier = Modifier.weight(1f),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Right,
-                color = LocalContentColor.current.copy(alpha = 0.8f)
-            )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(id = R.string.total_money),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = StringHelper.numberToFormattedString(
-                    state.herb.avgPrice.toFloat() * state.herb.totalWeight!!, ""
-                ) + " VND",
-                modifier = Modifier.weight(1f),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Right,
-                fontWeight = FontWeight.Bold,
-                color = LocalContentColor.current.copy(alpha = 0.8f)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.weight_remain),
+                    fontSize = 16.sp,
+                )
+                Text(
+                    text = StringHelper.floatToString(state.herb.totalWeight!!, 1) + " (g)",
+                    modifier = Modifier.weight(1f),
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Right,
+                    color = LocalContentColor.current.copy(alpha = 0.8f)
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.total_money),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = StringHelper.numberToFormattedString(
+                        (state.herb.avgPrice?.toFloat() ?: 0f) * state.herb.totalWeight!!
+                    ) + " VND",
+                    modifier = Modifier.weight(1f),
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Right,
+                    fontWeight = FontWeight.Bold,
+                    color = LocalContentColor.current.copy(alpha = 0.8f)
+                )
+            }
         }
     }
 }
@@ -260,8 +284,7 @@ fun MyDropDownBar(
                 Icon(icon, "contentDescription", Modifier.clickable { isExpand = !isExpand })
             })
 
-        DropdownMenu(
-            expanded = isExpand,
+        DropdownMenu(expanded = isExpand,
             onDismissRequest = { isExpand = false },
             modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
         ) {
@@ -357,7 +380,6 @@ fun HistoryStoreHerb(
 
 @Composable
 fun HerbDetailHistoryRow(storedHerb: StoredHerb) {
-    Log.d("HerbDetailScreen", "HerbDetailHistoryRow: ${storedHerb.storeID}")
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -394,19 +416,13 @@ fun HerbDetailHistoryRow(storedHerb: StoredHerb) {
 
     if (showDialog) {
         if (storedHerb.isImport) {
-            ReadImportHerbDetailHistoryDialog(
-                storedHerb = storedHerb,
-                onDismiss = {
-                    showDialog = false
-                }
-            )
+            ReadImportHerbDetailHistoryDialog(storedHerb = storedHerb, onDismiss = {
+                showDialog = false
+            })
         } else {
-            ReadExportHerbDetailHistoryDialog(
-                storedHerb = storedHerb,
-                onDismiss = {
-                    showDialog = false
-                }
-            )
+            ReadExportHerbDetailHistoryDialog(storedHerb = storedHerb, onDismiss = {
+                showDialog = false
+            })
         }
     }
 }

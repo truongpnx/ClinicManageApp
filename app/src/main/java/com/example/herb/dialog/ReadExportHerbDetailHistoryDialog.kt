@@ -110,7 +110,7 @@ fun ReadExportHerbDetailHistoryDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-                text = StringHelper.numberToFormattedString(storedHerb.buyPrice, "") + " VND/g",
+                text = StringHelper.numberToFormattedString(storedHerb.buyPrice) + " VND/g",
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 textAlign = TextAlign.Right,
                 color = defaultColor
@@ -151,7 +151,7 @@ fun ReadExportHerbDetailHistoryDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-                text = "- " + StringHelper.numberToFormattedString(totalMoney, "") + " VND",
+                text = "- " + StringHelper.numberToFormattedString(totalMoney) + " VND",
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                 textAlign = TextAlign.Center,
                 color = color

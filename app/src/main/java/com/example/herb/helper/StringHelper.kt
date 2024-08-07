@@ -22,8 +22,8 @@ interface StringHelper {
     companion object : StringHelper {
         override fun numberToFormattedString(number: Number, pattern: String): String {
             val decimalFormatSymbols = DecimalFormatSymbols().apply {
-                groupingSeparator = '.'
-                decimalSeparator = ','
+                groupingSeparator = ','
+                decimalSeparator = '.'
             }
             val decimalFormat = DecimalFormat(pattern, decimalFormatSymbols)
             return decimalFormat.format(number)
@@ -48,8 +48,8 @@ interface StringHelper {
 
         override fun stringToNumber(string: String, pattern: String): Number {
             val decimalFormatSymbols = DecimalFormatSymbols().apply {
-                groupingSeparator = '.'
-                decimalSeparator = ','
+                groupingSeparator = ','
+                decimalSeparator = '.'
             }
             val decimalFormat = DecimalFormat(pattern, decimalFormatSymbols)
             return decimalFormat.parse(string) ?: 0

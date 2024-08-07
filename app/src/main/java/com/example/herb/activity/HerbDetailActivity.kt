@@ -31,16 +31,26 @@ class HerbDetailActivity : ComponentActivity() {
         val herb = Herb(
             herbID = intent.getIntExtra(IntentExtraName.HERB_ID, 0),
             herbName = intent.getStringExtra(IntentExtraName.HERB_NAME)!!,
-            totalWeight = intent.getFloatExtra(IntentExtraName.HERB_WEIGHT, 0f),
-            avgPrice = intent.getLongExtra(IntentExtraName.HERB_PRICE, 0),
+            totalWeight = if (intent.hasExtra(IntentExtraName.HERB_WEIGHT))
+                intent.getFloatExtra(IntentExtraName.HERB_WEIGHT, 0f)
+            else null,
+            avgPrice = if (intent.hasExtra(IntentExtraName.HERB_PRICE)) intent.getLongExtra(IntentExtraName.HERB_PRICE, 0)
+            else null,
         )
-        viewModel = ViewModelProvider(this, HerbDetailViewModel.providesFactory(herbDetailViewModelFactory, herb))[HerbDetailViewModel::class.java]
+        viewModel = ViewModelProvider(
+            this,
+            HerbDetailViewModel.providesFactory(herbDetailViewModelFactory, herb)
+        )[HerbDetailViewModel::class.java]
 
         setContent {
             val state by viewModel.state.collectAsState()
 
             HerbTheme {
-                HerbDetailScreen(state.copy(herb = herb), viewModel::onEvent, Modifier.fillMaxSize())
+                HerbDetailScreen(
+                    state,
+                    viewModel::onEvent,
+                    Modifier.fillMaxSize()
+                )
             }
         }
     }

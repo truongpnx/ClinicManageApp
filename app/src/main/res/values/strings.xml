@@ -32,4 +32,7 @@
     <string name="process_time">Process Time</string>
     <string name="labor_cost">Labor Cost</string>
     <string name="additional_cost">Additional Cost</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
 </resources>

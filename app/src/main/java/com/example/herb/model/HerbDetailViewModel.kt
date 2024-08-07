@@ -50,7 +50,7 @@ class HerbDetailViewModel @AssistedInject constructor(
                 )
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    private val _state = MutableStateFlow(HerbDetailState())
+    private val _state = MutableStateFlow(HerbDetailState(herb = herb))
 
     val state = combine(
         _prescriptions,
@@ -63,7 +63,7 @@ class HerbDetailViewModel @AssistedInject constructor(
             storedHerbSortType = sortType,
             storedHerbs = storedHerbs,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HerbDetailState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HerbDetailState(herb = herb))
 
     fun onEvent(event: StoredHerbEvent) {
         when (event) {

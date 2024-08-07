@@ -84,7 +84,7 @@ class HerbViewModel @Inject constructor(
                     return
                 }
                 val herb = Herb(
-                    herbName = herbName.trim().lowercase(),
+                    herbName = herbName.trim(),
                     avgPrice = avgPrice,
                     totalWeight = totalWeight
                 )

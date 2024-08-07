@@ -4,11 +4,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.sql.Date
 
 @Entity(
     foreignKeys = [
-        ForeignKey(Herb::class, parentColumns = ["herbID"], childColumns = ["herbID"])
+        ForeignKey(Herb::class, parentColumns = ["herbID"], childColumns = ["herbID"], onDelete = ForeignKey.CASCADE)
     ],
     indices = [Index(value = ["herbID"])]
 )
@@ -26,6 +25,5 @@ data class StoredHerb(
     val storeWeight: Float,
     val additionalCost: Long,
     val isImport: Boolean
-// sellPrice = F * (buyWeight * buyPrice + additionalCost + processTime * Cong)/ storeWeight
 )
 
