@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.herb"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -81,7 +81,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
 //    implementation("androidx.compose.material:material:1.6.8")
+    // maxkeppeler CORE
+    implementation("com.maxkeppeler.sheets-compose-dialogs:core:1.3.0")
 
+    // maxkeppeler CALENDAR
+    implementation("com.maxkeppeler.sheets-compose-dialogs:calendar:1.3.0")
+
+    // maxkeppeler CLOCK
+    implementation("com.maxkeppeler.sheets-compose-dialogs:clock:1.3.0")
 
     // Dagger hilt
     implementation("com.google.dagger:hilt-android:2.49")

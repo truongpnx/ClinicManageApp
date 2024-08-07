@@ -7,7 +7,26 @@
     <string name="weight_remain">Tồn kho</string>
     <string name="total_money">Tổng tiền</string>
     <string name="add_herb_title">Thêm loại thuốc</string>
-    <string name="add_dialg_herb_name">Tên thuốc</string>
+    <string name="herb_name">Tên thuốc</string>
     <string name="save">Lưu</string>
+    <string name="detail">Chi tiết</string>
+    <string name="none_type">Không</string>
+    <string name="sort_by">Sắp xếp</string>
+    <string name="total_money_of">Tổng tiền của</string>
+    <string name="export_herb">Xuất hàng</string>
+    <string name="import_herb">Nhập hàng</string>
+    <string name="herb_history">Lịch sử Dược liệu</string>
+    <string name="date">Ngày</string>
+    <string name="buy_weight">Khối Lượng Mua</string>
+    <string name="sell_weight">Khối Lượng Bán</string>
+    <string name="sell_price">Giá Bán</string>
+    <string name="buy_price">Giá Mua</string>
+    <string name="store_weight">Khối Lượng Đã Trữ</string>
+    <string name="process_time">Thời Gian Sơ Chế</string>
+    <string name="labor_cost">Giá Công</string>
+    <string name="additional_cost">Phụ Phí</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
+    <string name="delete">Xóa</string>
 
 </resources>

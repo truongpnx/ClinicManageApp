@@ -3,6 +3,7 @@ package com.example.herb.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.herb.database.dao.HerbDao
+import com.example.herb.database.dao.StoreHerbDao
 import com.example.herb.database.entity.Examination
 import com.example.herb.database.entity.Herb
 import com.example.herb.database.entity.Patient
@@ -35,4 +36,5 @@ import com.example.herb.database.entity.exam.WatchExam
 abstract class HerbDatabase : RoomDatabase() {
     // TODO: add dao to database
     abstract fun herbDao(): HerbDao
+    abstract fun storedHerbDao(): StoreHerbDao
 }

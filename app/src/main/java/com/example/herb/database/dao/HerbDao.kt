@@ -2,11 +2,7 @@ package com.example.herb.database.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
-import androidx.room.Update
 import androidx.room.Upsert
 import com.example.herb.database.entity.Herb
 import kotlinx.coroutines.flow.Flow
@@ -31,4 +27,7 @@ interface HerbDao {
 
     @Query("SELECT * FROM herb WHERE herbName LIKE '%' || :stringQuery || '%' ORDER BY totalWeight ASC")
     fun getHerbsHasStringOrderByWeight(stringQuery: String): Flow<List<Herb>>
+
+    @Query("SELECT * FROM herb WHERE herbID = :herbID")
+    fun getHerbByID(herbID: Int): Herb
 }

@@ -33,7 +33,7 @@ fun AddHerbDialog(
                     onEvent(HerbEvent.SetHerbName(it))
                 },
                 placeholder = {
-                    Text(text = stringResource(id = R.string.add_dialg_herb_name))
+                    Text(text = stringResource(id = R.string.herb_name))
                 }
             )
         },

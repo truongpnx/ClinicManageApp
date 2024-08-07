@@ -1,25 +1,37 @@
 package com.example.herb.helper
 
-import kotlin.math.ceil
-import kotlin.math.floor
+import android.annotation.SuppressLint
+import android.util.Log
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 
 interface StringHelper {
 
-    fun numberToVND(number: Number): String
+    fun numberToFormattedString(number: Number, pattern: String = "#,###.##"): String
 
-    fun numberToFloorWeight(number: Number, weightUnit: String): String
+    fun floatToString(number: Float, digitAfterPoint: Int): String
 
     fun numberToString(number: Number, prefix: String, postfix: String): String
 
     fun toProperCase(string: String): String
 
-    companion object: StringHelper {
-        override fun numberToVND(number: Number): String {
-            return ceil(number.toFloat()).toInt().toString() + ".00 VND"
+    fun stringToNumber(string: String, pattern: String = "#,###.##"): Number
+
+    fun splitStringFloatPattern(string: String): Pair<String, String>
+
+    companion object : StringHelper {
+        override fun numberToFormattedString(number: Number, pattern: String): String {
+            val decimalFormatSymbols = DecimalFormatSymbols().apply {
+                groupingSeparator = ','
+                decimalSeparator = '.'
+            }
+            val decimalFormat = DecimalFormat(pattern, decimalFormatSymbols)
+            return decimalFormat.format(number)
         }
 
-        override fun numberToFloorWeight(number: Number, weightUnit: String): String {
-            return floor(number.toFloat()).toInt().toString() + " ($weightUnit)"
+        @SuppressLint("DefaultLocale")
+        override fun floatToString(number: Float, digitAfterPoint: Int): String {
+            return String.format("%.${digitAfterPoint}f", number)
         }
 
         override fun numberToString(number: Number, prefix: String, postfix: String): String {
@@ -33,5 +45,28 @@ interface StringHelper {
                 }
             }
         }
+
+        override fun stringToNumber(string: String, pattern: String): Number {
+            val decimalFormatSymbols = DecimalFormatSymbols().apply {
+                groupingSeparator = ','
+                decimalSeparator = '.'
+            }
+            val decimalFormat = DecimalFormat(pattern, decimalFormatSymbols)
+            return decimalFormat.parse(string) ?: 0
+        }
+
+        override fun splitStringFloatPattern(string: String): Pair<String, String> {
+            val regex = """(\d*)(\.(\d*))?""".toRegex()
+            val matchResult = regex.matchEntire(string)
+            return if (matchResult != null) {
+                Log.d("splitStringFloatPattern: ", matchResult.groupValues.joinToString(","))
+                val naturalPart = matchResult.groupValues[1].ifEmpty { "" }
+                val decimalPart = matchResult.groupValues[3].ifEmpty { "" }
+                Pair(naturalPart, decimalPart)
+            } else {
+                Pair("", "")
+            }
+        }
+
     }
 }

@@ -10,6 +10,6 @@ import androidx.room.PrimaryKey
 data class Herb(
     @PrimaryKey(autoGenerate = true) val herbID: Int = 0,
     val herbName: String,
-    val avgPrice: Long = 0,
-    val totalWeight: Float = 0f,
+    val avgPrice: Long?,
+    val totalWeight: Float?,
 )

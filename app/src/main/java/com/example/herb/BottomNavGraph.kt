@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,7 +19,7 @@ import com.example.herb.screens.SettingScreen
 import com.example.herb.state.HerbState
 
 @Composable
-fun BottomNavGraph(navController: NavHostController, paddingValues: PaddingValues) {
+fun BottomNavGraph(navController: NavHostController, modifier: Modifier) {
 
     val herbViewModel = hiltViewModel<HerbViewModel>()
 
@@ -29,14 +30,14 @@ fun BottomNavGraph(navController: NavHostController, paddingValues: PaddingValue
         Log.d("BottomNavGraph", "NavHost")
 
         composable(route = BottomBarScreen.Patient.route) {
-            PatientScreen(paddingValues)
+            PatientScreen(modifier)
         }
         composable(route = BottomBarScreen.Herb.route) {
             val state by herbViewModel.state.collectAsState()
-            HerbScreen(state, herbViewModel::onEvent, paddingValues)
+            HerbScreen(state, herbViewModel::onEvent, modifier)
         }
         composable(route = BottomBarScreen.Setting.route) {
-            SettingScreen(paddingValues)
+            SettingScreen(modifier)
         }
     }
 }
